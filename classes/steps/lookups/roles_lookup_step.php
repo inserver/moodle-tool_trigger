@@ -49,36 +49,31 @@ class roles_lookup_step extends base_lookup_step {
      *
      * @var array
      */
-    private static $stepfields = array('roles');
+    // private static $stepfields = array('roles');
+    private static $stepfields = array('roleid');
 
     protected function init() {
         $this->useridfield = $this->data['useridfield'];
         $this->outputprefix = $this->data['outputprefix'];
     }
-
     /**
      * {@inheritDoc}
      * @see \tool_trigger\steps\base\base_step::execute()
      */
     public function execute($step, $trigger, $event, $stepresults) {
         global $DB;
-
         $datafields = $this->get_datafields($event, $stepresults); // Do we need this???
-
         if (!array_key_exists($this->useridfield, $datafields)) {
             throw new \invalid_parameter_exception("Specified userid field not present in the workflow data: "
                 . $this->useridfield);
         }
-
         $sql = 'SELECT id, roleid, contextid, component, itemid FROM {role_assignments} WHERE userid = :userid';
         $params = array('userid' => $datafields[$this->useridfield]);
         $userroles = $DB->get_records_sql($sql, $params);
         foreach ($userroles as $role) {
-            foreach ($role as $key => $value) {
-                if (is_scalar($role->roleid)) {
-                    $stepresults[$this->outputprefix . 'roles'][ $role->id][$key] = $value;
-                }
-            }
+			foreach($role as $key => $value){
+				$stepresults[$this->outputprefix . $key] = $value;
+			}
         }
         return [true, $stepresults];
     }
