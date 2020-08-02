@@ -37,6 +37,13 @@ class roles_lookup_step extends base_lookup_step {
     private $useridfield = null;
 
     /**
+     * The data field to get the context id from.
+     * @var string
+     */
+    private $contextidfield = null;
+
+
+    /**
      * The prefix to put before the new fields added to the workflow data.
      *
      * @var string
@@ -54,6 +61,7 @@ class roles_lookup_step extends base_lookup_step {
 
     protected function init() {
         $this->useridfield = $this->data['useridfield'];
+        $this->contextidfield = $this->data['contextidfield'];
         $this->outputprefix = $this->data['outputprefix'];
     }
     /**
@@ -67,8 +75,8 @@ class roles_lookup_step extends base_lookup_step {
             throw new \invalid_parameter_exception("Specified userid field not present in the workflow data: "
                 . $this->useridfield);
         }
-        $sql = 'SELECT id, roleid, contextid, component, itemid FROM {role_assignments} WHERE userid = :userid';
-        $params = array('userid' => $datafields[$this->useridfield]);
+        $sql = 'SELECT id, roleid, contextid, component, itemid FROM {role_assignments} WHERE userid = :userid AND contextid = :contextid';
+        $params = array('userid' => $datafields[$this->useridfield], 'contextid' => $datafields[$this->contextidfield]);
         $userroles = $DB->get_records_sql($sql, $params);
         foreach ($userroles as $role) {
 			foreach($role as $key => $value){
@@ -87,6 +95,11 @@ class roles_lookup_step extends base_lookup_step {
         $mform->setType('useridfield', PARAM_ALPHANUMEXT);
         $mform->addRule('useridfield', get_string('required'), 'required');
         $mform->setDefault('useridfield', 'userid');
+
+        $mform->addElement('text', 'contextidfield', get_string('contextidfield', 'tool_trigger'));
+        $mform->setType('contextidfield', PARAM_ALPHANUMEXT);
+        $mform->addRule('contextidfield', get_string('required'), 'required');
+        $mform->setDefault('contextidfield', 'contextid');
 
         $mform->addElement('text', 'outputprefix', get_string('outputprefix', 'tool_trigger'));
         $mform->setType('outputprefix', PARAM_ALPHANUMEXT);
