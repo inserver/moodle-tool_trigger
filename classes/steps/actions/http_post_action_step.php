@@ -143,6 +143,7 @@ class http_post_action_step extends base_action_step {
             $formparams = $this->render_datafields($this->params, null, null, null);
             parse_str($formparams, $output);
             $params = json_encode($output);
+            $headers['Content-Type'] = 'application/json';
         }
 
         $request = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $params);
