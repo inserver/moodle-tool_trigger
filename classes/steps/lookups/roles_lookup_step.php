@@ -70,23 +70,32 @@ class roles_lookup_step extends base_lookup_step {
      */
     public function execute($step, $trigger, $event, $stepresults) {
         global $DB;
-        $datafields = $this->get_datafields($event, $stepresults); // Do we need this???
+        $datafields = $this->get_datafields($event, $stepresults);
 
+        switch ($datafields['eventname'])
+        {
+            case '\core\event\group_member_added':
+            case '\core\event\group_member_removed':
+                $sql = 'SELECT idnumber FROM {groups} WHERE id = :groupid';
+                $params = ['groupid' => $datafields['objectid']];
+                $eventObject = $DB->get_field_sql($sql, $params);
+            break;
+
+            case '\core\event\role_assigned':
+            case '\core\event\role_unassigned':
+                $sql = 'SELECT shortname FROM {role} WHERE id = :roleid';
+                $params = ['roleid' => $datafields['objectid']];
+                $eventObject = $DB->get_field_sql($sql, $params);
+            break;
+        }
+        
+        $stepresults[$this->outputprefix . 'event'] = $eventObject;
+        
         if (!array_key_exists($this->useridfield, $datafields)) {
             throw new \invalid_parameter_exception("Specified userid field not present in the workflow data: "
                 . $this->useridfield);
         }
-        // $sql = 'SELECT id, roleid, contextid, component, itemid FROM {role_assignments} WHERE userid = :userid AND contextid = :contextid';
-        // $params = array('userid' => $datafields[$this->useridfield], 'contextid' => $datafields[$this->contextidfield]);
-        // $userroles = $DB->get_records_sql($sql, $params);
-        // foreach ($userroles as $role) {
-        //     foreach($role as $key => $value){
-		// 		$stepresults[$this->outputprefix . $key] = $value;
-		// 	}
-        // }
-        // 20200810: hack, necesitamos el roleid del evento, no los roleid que tiene la persona usuaria
-        // al borrar un rol nos devolvería el último que tuviese (si aún tiene alguno) la persona, no el roleid que se ha borrado
-        $stepresults[$this->outputprefix . 'roleid'] = $datafields['objectid'];
+        
         return [true, $stepresults];
     }
 
