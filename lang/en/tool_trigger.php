@@ -212,6 +212,10 @@ $string['step_lookup_roles:privacy:userdata_desc'] = 'Data about user roles in v
 $string['step_lookup_roles_desc'] = 'This step looks up user roles.';
 $string['step_lookup_roles_name'] = 'User roles lookup';
 
+$string['step_lookup_event:privacy:userdata_desc'] = 'Data about user event in various contexts.';
+$string['step_lookup_event_desc'] = 'This step looks up user event.';
+$string['step_lookup_event_name'] = 'User event lookup';
+
 $string['step_action_email:privacy:desc'] = 'This plugin may be configured to send emails containing data from Moodle.';
 $string['step_action_httppost:privacy:desc'] = 'This plugin may be configured to send HTTP requests to external addresses, containing data from Moodle.';
 $string['step_action_logdump_desc'] = 'This step prints the event and workflow steps data to the cron log. (Mostly useful for testing.)';
